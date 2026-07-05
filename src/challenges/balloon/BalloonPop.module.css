@@ -1,0 +1,144 @@
+.center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 40px 0;
+}
+
+.lost {
+  color: var(--text);
+  font-size: 17px;
+  margin: 0;
+}
+
+.warn {
+  color: #ef4444;
+  font-size: 15px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.taunt {
+  position: absolute;
+  top: 56px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 4;
+  background: rgba(239, 68, 68, 0.95);
+  color: #fff;
+  font-weight: 700;
+  font-size: 15px;
+  padding: 10px 16px;
+  border-radius: 12px;
+  max-width: 88%;
+  text-align: center;
+  pointer-events: none;
+  animation: taunt-pop 0.25s ease;
+}
+
+@keyframes taunt-pop {
+  from { opacity: 0; transform: translate(-50%, -6px) scale(0.9); }
+}
+
+.startBtn {
+  border: none;
+  border-radius: 999px;
+  padding: 16px 40px;
+  font-size: 20px;
+  font-weight: 600;
+  color: #fff;
+  background: linear-gradient(135deg, #ff5c8a, #c084fc);
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(192, 132, 252, 0.4);
+}
+
+.startBtn:active {
+  transform: scale(0.96);
+}
+
+.stage {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 62svh;
+  min-height: 420px;
+}
+
+.hud {
+  display: flex;
+  justify-content: space-between;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-h);
+  padding: 4px 8px 12px;
+}
+
+.urgent {
+  color: #ef4444;
+  animation: blink 0.6s steps(2, start) infinite;
+}
+
+@keyframes blink {
+  50% { opacity: 0.35; }
+}
+
+.field {
+  position: relative;
+  flex: 1;
+  overflow: hidden;
+  border-radius: 20px;
+  background:
+    radial-gradient(120% 80% at 50% 100%, var(--accent-bg), transparent 70%);
+  touch-action: manipulation;
+}
+
+.balloon {
+  position: absolute;
+  bottom: -80px;
+  width: 54px;
+  height: 66px;
+  border: none;
+  padding: 0;
+  border-radius: 50% 50% 48% 48%;
+  cursor: pointer;
+  box-shadow: inset -8px -8px 14px rgba(0, 0, 0, 0.15);
+  animation: float var(--dur) linear forwards;
+  touch-action: manipulation;
+}
+
+.balloon::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  width: 2px;
+  height: 12px;
+  background: rgba(0, 0, 0, 0.25);
+  transform: translateX(-50%);
+}
+
+.bomb {
+  display: grid;
+  place-items: center;
+  font-size: 26px;
+  box-shadow: inset -8px -8px 14px rgba(0, 0, 0, 0.4);
+}
+
+@keyframes float {
+  to {
+    transform: translate(var(--drift), -120svh);
+  }
+}
+
+.win {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 40px;
+  font-weight: 800;
+  color: var(--text-h);
+  z-index: 3;
+  pointer-events: none;
+}
