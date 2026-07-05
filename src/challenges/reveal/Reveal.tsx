@@ -1,9 +1,9 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import styles from './Reveal.module.css'
 
-/** Byt ut mot det riktiga presentkortskoden här. */
-const GIFT_CARD_CODE = 'GRATTIS-16-XXXX-XXXX'
-const RECIPIENT = 'grattis på födelsedagen!'
+/** Byt ut mot den riktiga presentkortskoden här. */
+const GIFT_CARD_CODE = 'TVCBTFRO'
+const GIFT_CARD_VALUE = '500,00 kr'
 
 const CONFETTI_COLORS = ['#ff5c8a', '#ffb703', '#8ecae6', '#a3e635', '#c084fc', '#fb7185']
 
@@ -15,20 +15,19 @@ interface Piece {
   rotate: number
 }
 
+function makeConfetti(): Piece[] {
+  return Array.from({ length: 80 }, () => ({
+    left: Math.random() * 100,
+    delay: Math.random() * 2.5,
+    duration: 3 + Math.random() * 2.5,
+    color: CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)],
+    rotate: Math.random() * 360,
+  }))
+}
+
 export function Reveal() {
   const [copied, setCopied] = useState(false)
-
-  const confetti = useMemo<Piece[]>(
-    () =>
-      Array.from({ length: 80 }, () => ({
-        left: Math.random() * 100,
-        delay: Math.random() * 2.5,
-        duration: 3 + Math.random() * 2.5,
-        color: CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)],
-        rotate: Math.random() * 360,
-      })),
-    [],
-  )
+  const [confetti] = useState<Piece[]>(makeConfetti)
 
   useEffect(() => {
     if (!copied) return
@@ -66,15 +65,32 @@ export function Reveal() {
       </div>
 
       <div className={styles.card}>
-        <div className={styles.emoji}>🎉🎂🎁</div>
-        <h2 className={styles.title}>Du klarade alla utmaningar!</h2>
-        <p className={styles.sub}>{RECIPIENT}</p>
+        <img
+          className={styles.hero}
+          src="lyko-giftcard.png"
+          alt="Lyko presentkort"
+        />
 
-        <div className={styles.codeLabel}>Ditt presentkort</div>
-        <button type="button" className={styles.code} onClick={copy}>
-          {GIFT_CARD_CODE}
-        </button>
-        <p className={styles.copyHint}>{copied ? 'Kopierat! ✅' : 'Tryck för att kopiera'}</p>
+        <div className={styles.value}>
+          <span className={styles.valueLabel}>Värde</span>
+          <span className={styles.valueAmount}>{GIFT_CARD_VALUE}</span>
+        </div>
+
+        <p className={styles.body}>
+          Grattis! 🎉 Använd koden i kassan online eller i butik.
+        </p>
+
+        <div className={styles.codeBlock}>
+          <span className={styles.codeLabel}>Din personliga kod</span>
+          <button type="button" className={styles.code} onClick={copy}>
+            {GIFT_CARD_CODE}
+          </button>
+          <span className={styles.copyHint}>
+            {copied ? 'Kopierad! ✅' : 'Tryck för att kopiera'}
+          </span>
+        </div>
+
+        <p className={styles.happy}>Happy shopping! 💅</p>
       </div>
     </div>
   )

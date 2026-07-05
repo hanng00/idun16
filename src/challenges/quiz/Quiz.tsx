@@ -36,7 +36,6 @@ export function Quiz({ onComplete, onFail }: ChallengeProps) {
   const questions = useMemo(prepare, [])
   const [index, setIndex] = useState(0)
   const [picked, setPicked] = useState<number | null>(null)
-  const [fakeout, setFakeout] = useState(false)
 
   const q = questions[index]
   const isLast = index === questions.length - 1
@@ -46,11 +45,6 @@ export function Quiz({ onComplete, onFail }: ChallengeProps) {
   function choose(i: number) {
     if (answered) return
     setPicked(i)
-    if (i === q.correct) {
-      // Troll: flash "Fel!" for a beat before admitting it's right.
-      setFakeout(true)
-      window.setTimeout(() => setFakeout(false), 850)
-    }
   }
 
   function next() {
@@ -100,7 +94,7 @@ export function Quiz({ onComplete, onFail }: ChallengeProps) {
               disabled={answered}
             >
               {opt}
-              {answered && isRight && i === q.correct && !fakeout && (
+              {answered && isRight && i === q.correct && (
                 <span className={styles.mark}> ✓</span>
               )}
               {answered && !isRight && i === picked && (
@@ -115,15 +109,11 @@ export function Quiz({ onComplete, onFail }: ChallengeProps) {
         <div className={styles.feedback}>
           {isRight ? (
             <>
-              <p className={`${styles.reaction} ${fakeout ? styles.fake : ''}`}>
-                {fakeout ? 'Fel! 😈' : 'Rätt! 🎉'}
-              </p>
-              {!fakeout && q.note && <p className={styles.note}>{q.note}</p>}
-              {!fakeout && (
-                <button type="button" className={styles.nextBtn} onClick={next}>
-                  {isLast ? 'Klar!' : 'Nästa'}
-                </button>
-              )}
+              <p className={styles.reaction}>Rätt! 🎉</p>
+              {q.note && <p className={styles.note}>{q.note}</p>}
+              <button type="button" className={styles.nextBtn} onClick={next}>
+                {isLast ? 'Klar!' : 'Nästa'}
+              </button>
             </>
           ) : (
             <>

@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import './App.css'
 import { challenges } from './challenges/registry'
 import { Reveal } from './challenges/reveal/Reveal'
@@ -7,8 +7,16 @@ import { TrollGate } from './challenges/troll/TrollGate'
 
 type Screen = 'welcome' | 'intro' | 'playing' | 'gate' | 'reveal'
 
+/** She unlocked the gift card once `?done=1` is in the URL. */
+function isUnlocked(): boolean {
+  if (typeof window === 'undefined') return false
+  return new URLSearchParams(window.location.search).get('done') === '1'
+}
+
 function App() {
-  const [screen, setScreen] = useState<Screen>('welcome')
+  const [screen, setScreen] = useState<Screen>(() =>
+    isUnlocked() ? 'reveal' : 'welcome',
+  )
   const [index, setIndex] = useState(0)
   const [returnTo, setReturnTo] = useState<number | null>(null)
   const [runKey, setRunKey] = useState(0)
@@ -17,6 +25,20 @@ function App() {
 
   const current = challenges[index]
   const total = challenges.length
+
+  // Persist the unlocked reveal in the URL so it survives a page refresh.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const has = params.get('done') === '1'
+    if (screen === 'reveal' && !has) {
+      params.set('done', '1')
+      window.history.replaceState(null, '', `?${params.toString()}`)
+    } else if (screen !== 'reveal' && has) {
+      params.delete('done')
+      const q = params.toString()
+      window.history.replaceState(null, '', q ? `?${q}` : window.location.pathname)
+    }
+  }, [screen])
 
   const startQuest = useCallback(() => {
     setIndex(0)

@@ -56,11 +56,11 @@ export const quizQuestions: QuizQuestion[] = [
   {
     question: 'Vad finns på LYKO?',
     options: [
-      'Hårprodukter & skönhet',
-      'Settings spray',
+      'Gräsklippare',
+      'Setting spray',
       'Motivation till att plugga',
     ],
-    correctIndex: 0,
+    correctIndex: 1,
     note: 'LYKO = hår & skönhet. Motivationen får du hitta någon annanstans. 💅',
   },
 ]
