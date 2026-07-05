@@ -53,12 +53,9 @@ export function BalloonPop({ onComplete }: ChallengeProps) {
     window.clearInterval(tickRef.current)
   }, [])
 
-  const start = useCallback(() => {
-    const s = speedRef.current
-    setPhase('playing')
-    setPopped(0)
-    setTimeLeft(DURATION)
-    setBalloons([makeBalloon(s), makeBalloon(s), makeBalloon(s)])
+  const runIntervals = useCallback((s: number) => {
+    window.clearInterval(spawnRef.current)
+    window.clearInterval(tickRef.current)
 
     spawnRef.current = window.setInterval(() => {
       setBalloons((prev) => [...prev, makeBalloon(speedRef.current)].slice(-14))
@@ -76,6 +73,25 @@ export function BalloonPop({ onComplete }: ChallengeProps) {
       })
     }, 1000 / s)
   }, [])
+
+  const start = useCallback(() => {
+    const s = speedRef.current
+    setPhase('playing')
+    setPopped(0)
+    setTimeLeft(DURATION)
+    setBalloons([makeBalloon(s), makeBalloon(s), makeBalloon(s)])
+    runIntervals(s)
+  }, [runIntervals])
+
+  /** Live-toggle speed. Restarts the cadence immediately while playing. */
+  const setRunSpeed = useCallback(
+    (s: number) => {
+      speedRef.current = s
+      setSpeed(s)
+      if (phase === 'playing') runIntervals(s)
+    },
+    [phase, runIntervals],
+  )
 
   useEffect(() => stop, [stop])
 
@@ -108,35 +124,12 @@ export function BalloonPop({ onComplete }: ChallengeProps) {
   }, [phase, onComplete])
 
   if (phase === 'idle' || phase === 'lost') {
-    const pick = (s: number) => {
-      speedRef.current = s
-      setSpeed(s)
-    }
     return (
       <div className={styles.center}>
         {phase === 'lost' && (
           <p className={styles.lost}>Nästan! Du poppade {popped} av {TARGET}. Testa igen! 🎈</p>
         )}
         <p className={styles.warn}>Psst: poppa INTE de svarta ballongerna 💣</p>
-        <div className={styles.speedRow}>
-          <span className={styles.speedLabel}>Fart</span>
-          <div className={styles.speedToggle} role="group" aria-label="Välj fart">
-            <button
-              type="button"
-              className={`${styles.speedBtn} ${speed === 1 ? styles.speedActive : ''}`}
-              onClick={() => pick(1)}
-            >
-              1x
-            </button>
-            <button
-              type="button"
-              className={`${styles.speedBtn} ${speed === 2 ? styles.speedActive : ''}`}
-              onClick={() => pick(2)}
-            >
-              2x ⚡
-            </button>
-          </div>
-        </div>
         <button type="button" className={styles.startBtn} onClick={start}>
           {phase === 'lost' ? 'Försök igen' : 'Starta'}
         </button>
@@ -148,7 +141,6 @@ export function BalloonPop({ onComplete }: ChallengeProps) {
     <div className={styles.stage}>
       <div className={styles.hud}>
         <span>🎈 {popped}/{TARGET}</span>
-        <span className={styles.speedTag}>{speed}x</span>
         <span className={timeLeft <= 4 ? styles.urgent : ''}>⏱ {timeLeft}s</span>
       </div>
 
@@ -175,6 +167,23 @@ export function BalloonPop({ onComplete }: ChallengeProps) {
             {b.bomb ? '💣' : ''}
           </button>
         ))}
+
+        <div className={styles.speedToggle} role="group" aria-label="Fart">
+          <button
+            type="button"
+            className={`${styles.speedBtn} ${speed === 1 ? styles.speedActive : ''}`}
+            onClick={() => setRunSpeed(1)}
+          >
+            1x
+          </button>
+          <button
+            type="button"
+            className={`${styles.speedBtn} ${speed === 2 ? styles.speedActive : ''}`}
+            onClick={() => setRunSpeed(2)}
+          >
+            2x ⚡
+          </button>
+        </div>
       </div>
     </div>
   )

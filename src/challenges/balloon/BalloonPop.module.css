@@ -19,52 +19,36 @@
   margin: 0;
 }
 
-.speedRow {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.speedLabel {
-  font-size: 14px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  color: var(--text);
-  font-weight: 700;
-}
-
 .speedToggle {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  z-index: 5;
   display: inline-flex;
   padding: 4px;
   border-radius: 999px;
-  background: var(--code-bg);
+  background: color-mix(in srgb, var(--bg) 82%, transparent);
+  backdrop-filter: blur(6px);
   border: 1px solid var(--border);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
 }
 
 .speedBtn {
   border: none;
   background: none;
   border-radius: 999px;
-  padding: 8px 18px;
-  font-size: 16px;
+  padding: 8px 14px;
+  font-size: 15px;
   font-weight: 700;
   color: var(--text);
   cursor: pointer;
   transition: background 0.15s, color 0.15s;
+  touch-action: manipulation;
 }
 
 .speedActive {
   background: linear-gradient(135deg, #ff5c8a, #c084fc);
   color: #fff;
-}
-
-.speedTag {
-  font-size: 15px;
-  font-weight: 700;
-  color: var(--accent);
-  background: var(--accent-bg);
-  padding: 2px 10px;
-  border-radius: 999px;
 }
 
 .taunt {
