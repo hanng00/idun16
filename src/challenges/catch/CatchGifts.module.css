@@ -38,8 +38,8 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  height: 62svh;
-  min-height: 440px;
+  flex: 1;
+  min-height: 0;
 }
 
 .hud {

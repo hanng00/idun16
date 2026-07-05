@@ -32,11 +32,10 @@ function prepare(): PreparedQuestion[] {
   })
 }
 
-export function Quiz({ onComplete }: ChallengeProps) {
+export function Quiz({ onComplete, onFail }: ChallengeProps) {
   const questions = useMemo(prepare, [])
   const [index, setIndex] = useState(0)
   const [picked, setPicked] = useState<number | null>(null)
-  const [correctCount, setCorrectCount] = useState(0)
   const [fakeout, setFakeout] = useState(false)
 
   const q = questions[index]
@@ -48,15 +47,10 @@ export function Quiz({ onComplete }: ChallengeProps) {
     if (answered) return
     setPicked(i)
     if (i === q.correct) {
-      setCorrectCount((c) => c + 1)
       // Troll: flash "Fel!" for a beat before admitting it's right.
       setFakeout(true)
       window.setTimeout(() => setFakeout(false), 850)
     }
-  }
-
-  function retry() {
-    setPicked(null)
   }
 
   function next() {
@@ -68,10 +62,20 @@ export function Quiz({ onComplete }: ChallengeProps) {
     setPicked(null)
   }
 
+  const failTaunts = [
+    'Fel svar. -5000 aura. 📉 Tillbaka till ballongerna med dig.',
+    'Det där var inte särskilt demure. 🤡 Kör ballongerna igen.',
+    'Crashout detected. 💀 Du får börja om med ballongerna.',
+  ]
+  const failMsg = useMemo(
+    () => failTaunts[Math.floor(Math.random() * failTaunts.length)],
+    [picked],
+  )
+
   return (
     <div className={styles.wrap}>
       <div className={styles.progress}>
-        Fråga {index + 1} / {questions.length} · rätt: {correctCount}
+        Fråga {index + 1} / {questions.length} · no crumbs 💅
       </div>
 
       <h3 className={styles.question}>{q.question}</h3>
@@ -123,9 +127,13 @@ export function Quiz({ onComplete }: ChallengeProps) {
             </>
           ) : (
             <>
-              <p className={styles.reaction}>Nej då. Läs frågan igen... 🧐</p>
-              <button type="button" className={styles.nextBtn} onClick={retry}>
-                Försök igen
+              <p className={`${styles.reaction} ${styles.fake}`}>{failMsg}</p>
+              <button
+                type="button"
+                className={styles.nextBtn}
+                onClick={() => (onFail ? onFail() : setPicked(null))}
+              >
+                Tillbaka till ballongerna 🎈
               </button>
             </>
           )}

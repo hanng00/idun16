@@ -4,6 +4,8 @@ import type { ComponentType } from 'react'
 export interface ChallengeProps {
   /** Call when the player successfully clears the challenge. */
   onComplete: () => void
+  /** Optional: call when the player fails in a way that triggers a punishment. */
+  onFail?: () => void
 }
 
 export interface Challenge {

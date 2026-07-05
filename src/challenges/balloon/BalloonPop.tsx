@@ -7,9 +7,9 @@ const DURATION = 16
 const COLORS = ['#ff5c8a', '#ffb703', '#8ecae6', '#a3e635', '#c084fc', '#fb7185']
 const BOMB_PENALTY = 3
 const BOMB_TAUNTS = [
-  'BOOM! 💥 Inte alla ballonger är snälla...',
-  'Aj. Den där var en bomb. -3! 💣',
-  'Lär dig: svarta ballonger = fara. 💀',
+  'BOOM! 💥 -5000 aura. Inte alla ballonger är snälla...',
+  'Aj. Det var en bomb. Väldigt lite demure. -3! 💣',
+  'Svarta ballonger = fara. Lär dig, sigma. 💀',
 ]
 
 interface Balloon {
@@ -23,14 +23,14 @@ interface Balloon {
 
 let balloonSeq = 0
 
-function makeBalloon(): Balloon {
+function makeBalloon(speed: number): Balloon {
   const bomb = Math.random() < 0.18
   return {
     id: balloonSeq++,
     left: 6 + Math.random() * 82,
     color: bomb ? '#1f2937' : COLORS[Math.floor(Math.random() * COLORS.length)],
     drift: (Math.random() - 0.5) * 40,
-    duration: 3.4 + Math.random() * 2.2,
+    duration: (3.4 + Math.random() * 2.2) / speed,
     bomb,
   }
 }
@@ -43,6 +43,8 @@ export function BalloonPop({ onComplete }: ChallengeProps) {
   const [timeLeft, setTimeLeft] = useState(DURATION)
   const [balloons, setBalloons] = useState<Balloon[]>([])
   const [taunt, setTaunt] = useState<string | null>(null)
+  const [speed, setSpeed] = useState(1)
+  const speedRef = useRef(1)
   const spawnRef = useRef<number | undefined>(undefined)
   const tickRef = useRef<number | undefined>(undefined)
 
@@ -52,14 +54,15 @@ export function BalloonPop({ onComplete }: ChallengeProps) {
   }, [])
 
   const start = useCallback(() => {
+    const s = speedRef.current
     setPhase('playing')
     setPopped(0)
     setTimeLeft(DURATION)
-    setBalloons([makeBalloon(), makeBalloon(), makeBalloon()])
+    setBalloons([makeBalloon(s), makeBalloon(s), makeBalloon(s)])
 
     spawnRef.current = window.setInterval(() => {
-      setBalloons((prev) => [...prev, makeBalloon()].slice(-14))
-    }, 620)
+      setBalloons((prev) => [...prev, makeBalloon(speedRef.current)].slice(-14))
+    }, 620 / s)
 
     tickRef.current = window.setInterval(() => {
       setTimeLeft((t) => {
@@ -71,7 +74,7 @@ export function BalloonPop({ onComplete }: ChallengeProps) {
         }
         return t - 1
       })
-    }, 1000)
+    }, 1000 / s)
   }, [])
 
   useEffect(() => stop, [stop])
@@ -105,12 +108,35 @@ export function BalloonPop({ onComplete }: ChallengeProps) {
   }, [phase, onComplete])
 
   if (phase === 'idle' || phase === 'lost') {
+    const pick = (s: number) => {
+      speedRef.current = s
+      setSpeed(s)
+    }
     return (
       <div className={styles.center}>
         {phase === 'lost' && (
           <p className={styles.lost}>Nästan! Du poppade {popped} av {TARGET}. Testa igen! 🎈</p>
         )}
         <p className={styles.warn}>Psst: poppa INTE de svarta ballongerna 💣</p>
+        <div className={styles.speedRow}>
+          <span className={styles.speedLabel}>Fart</span>
+          <div className={styles.speedToggle} role="group" aria-label="Välj fart">
+            <button
+              type="button"
+              className={`${styles.speedBtn} ${speed === 1 ? styles.speedActive : ''}`}
+              onClick={() => pick(1)}
+            >
+              1x
+            </button>
+            <button
+              type="button"
+              className={`${styles.speedBtn} ${speed === 2 ? styles.speedActive : ''}`}
+              onClick={() => pick(2)}
+            >
+              2x ⚡
+            </button>
+          </div>
+        </div>
         <button type="button" className={styles.startBtn} onClick={start}>
           {phase === 'lost' ? 'Försök igen' : 'Starta'}
         </button>
@@ -122,10 +148,11 @@ export function BalloonPop({ onComplete }: ChallengeProps) {
     <div className={styles.stage}>
       <div className={styles.hud}>
         <span>🎈 {popped}/{TARGET}</span>
+        <span className={styles.speedTag}>{speed}x</span>
         <span className={timeLeft <= 4 ? styles.urgent : ''}>⏱ {timeLeft}s</span>
       </div>
 
-      {phase === 'won' && <div className={styles.win}>🎉 Klart!</div>}
+      {phase === 'won' && <div className={styles.win}>💅 Ate!</div>}
       {taunt && <div className={styles.taunt}>{taunt}</div>}
 
       <div className={styles.field}>

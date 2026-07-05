@@ -10,6 +10,9 @@ type Screen = 'welcome' | 'intro' | 'playing' | 'gate' | 'reveal'
 function App() {
   const [screen, setScreen] = useState<Screen>('welcome')
   const [index, setIndex] = useState(0)
+  const [returnTo, setReturnTo] = useState<number | null>(null)
+  const [runKey, setRunKey] = useState(0)
+  const [punish, setPunish] = useState(false)
   const [skipTaunt, setSkipTaunt] = useState(0)
 
   const current = challenges[index]
@@ -17,25 +20,46 @@ function App() {
 
   const startQuest = useCallback(() => {
     setIndex(0)
+    setReturnTo(null)
     setScreen('intro')
   }, [])
 
-  const beginChallenge = useCallback(() => setScreen('playing'), [])
+  const beginChallenge = useCallback(() => {
+    setPunish(false)
+    setScreen('playing')
+  }, [])
 
   const completeChallenge = useCallback(() => {
+    // If she was punished back to an earlier stage, resume where she failed.
+    if (returnTo !== null && index < returnTo) {
+      const target = returnTo
+      setReturnTo(null)
+      setIndex(target)
+      setScreen('intro')
+      return
+    }
     if (index + 1 >= total) {
       setScreen('gate')
     } else {
       setIndex((i) => i + 1)
       setScreen('intro')
     }
-  }, [index, total])
+  }, [index, total, returnTo])
+
+  const failChallenge = useCallback(() => {
+    // Send her all the way back to redo the balloon challenge (index 0).
+    setReturnTo(index)
+    setIndex(0)
+    setRunKey((k) => k + 1)
+    setPunish(true)
+    setScreen('intro')
+  }, [index])
 
   const skipTaunts = [
-    'Haha nej. 😌',
-    'Fint försök.',
+    'Haha nej. 💀',
+    'Fint försök, väldigt delulu. 🌌',
     'Absolut inte.',
-    'Du måste jobba för det. 💪',
+    'Du måste jobba för det. 💅',
   ]
 
   return (
@@ -45,8 +69,8 @@ function App() {
           <div className="bigEmoji">🎂</div>
           <h1>Grattis på 16-årsdagen!</h1>
           <p className="lead">
-            Innan du får ditt presentkort måste du klara {total} små utmaningar.
-            Inga genvägar. Redo?
+            Innan du får ditt presentkort måste du klara {total} utmaningar.
+            Inga genvägar, no crumbs. Let her cook 👨‍🍳
           </p>
           <RunawayButton dodges={2} onClick={startQuest}>
             Kör igång 🚀
@@ -64,6 +88,12 @@ function App() {
       {screen === 'intro' && (
         <section className="intro">
           <StepDots total={total} index={index} />
+          {punish && (
+            <p className="punish">
+              💀 Fel svar i quizet! -5000 aura. Du måste klara ballongerna igen
+              innan du får fortsätta.
+            </p>
+          )}
           <div className="bigEmoji">{current.emoji}</div>
           <p className="stepCount">
             Utmaning {index + 1} av {total}
@@ -82,7 +112,11 @@ function App() {
           <h2 className="playHeading">
             {current.emoji} {current.title}
           </h2>
-          <current.Component onComplete={completeChallenge} />
+          <current.Component
+            key={`${current.id}-${runKey}`}
+            onComplete={completeChallenge}
+            onFail={failChallenge}
+          />
         </section>
       )}
 

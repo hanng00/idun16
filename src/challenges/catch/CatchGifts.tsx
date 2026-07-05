@@ -35,7 +35,7 @@ export function CatchGifts({ onComplete }: ChallengeProps) {
   const livesRef = useRef(LIVES)
 
   const fakeWin = () => {
-    setTaunt('HAHA! Den knappen var falsk. -4 presenter! 😈')
+    setTaunt('HAHA! Falsk knapp. Du blev fanum-taxad. -4 presenter! 💀')
     window.setTimeout(() => setTaunt(null), 1400)
     scoreRef.current = Math.max(0, scoreRef.current - 4)
     setScore(scoreRef.current)
@@ -165,7 +165,7 @@ export function CatchGifts({ onComplete }: ChallengeProps) {
         <span>{'❤️'.repeat(lives)}{'🖤'.repeat(LIVES - lives)}</span>
       </div>
 
-      {phase === 'won' && <div className={styles.win}>🎉 Klart!</div>}
+      {phase === 'won' && <div className={styles.win}>💅 Ate!</div>}
       {taunt && <div className={styles.taunt}>{taunt}</div>}
 
       {score >= Math.ceil(GOAL / 2) && phase === 'playing' && (

@@ -19,6 +19,54 @@
   margin: 0;
 }
 
+.speedRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.speedLabel {
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text);
+  font-weight: 700;
+}
+
+.speedToggle {
+  display: inline-flex;
+  padding: 4px;
+  border-radius: 999px;
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+}
+
+.speedBtn {
+  border: none;
+  background: none;
+  border-radius: 999px;
+  padding: 8px 18px;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.speedActive {
+  background: linear-gradient(135deg, #ff5c8a, #c084fc);
+  color: #fff;
+}
+
+.speedTag {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--accent);
+  background: var(--accent-bg);
+  padding: 2px 10px;
+  border-radius: 999px;
+}
+
 .taunt {
   position: absolute;
   top: 56px;
@@ -61,8 +109,8 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  height: 62svh;
-  min-height: 420px;
+  flex: 1;
+  min-height: 0;
 }
 
 .hud {
