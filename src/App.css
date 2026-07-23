@@ -1,14 +1,63 @@
+.appContainer {
+  width: 100%;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Sticky header breadcrumb */
+.stickyHeader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: 10px 12px calc(10px + env(safe-area-inset-top));
+  background: rgba(15, 15, 25, 0.95);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  z-index: 100;
+  box-sizing: border-box;
+}
+
+.breadcrumb {
+  max-width: 500px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.breadcrumbStep {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--accent);
+  background: rgba(255, 255, 255, 0.1);
+  padding: 4px 10px;
+  border-radius: 20px;
+}
+
+.breadcrumbTitle {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+}
+
 .quest {
+  flex: 1;
   width: 100%;
   max-width: 520px;
-  height: 100dvh;
   margin: 0 auto;
-  padding: 16px 20px calc(16px + env(safe-area-inset-bottom));
+  padding: 60px 16px 120px; /* Top padding for header, bottom for meter */
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
   justify-content: center;
   overflow: hidden;
+  min-height: 0;
 }
 
 .quest > section {
@@ -63,42 +112,14 @@
   font-size: 20px;
   font-weight: 700;
   color: #fff;
-  background: linear-gradient(135deg, #ff5c8a, #c084fc);
+  background: linear-gradient(135deg, #f472b6, #60a5fa);
   cursor: pointer;
-  box-shadow: 0 10px 30px rgba(192, 132, 252, 0.45);
+  box-shadow: 0 10px 30px rgba(96, 165, 250, 0.45);
   transition: transform 0.1s;
 }
 
 .cta:active {
   transform: scale(0.96);
-}
-
-.skip {
-  margin-top: 4px;
-  border: none;
-  background: none;
-  color: var(--text);
-  font-size: 14px;
-  text-decoration: underline;
-  cursor: pointer;
-  opacity: 0.7;
-}
-
-.skip:hover {
-  opacity: 1;
-}
-
-.punish {
-  color: #ef4444;
-  background: rgba(239, 68, 68, 0.12);
-  border: 1px solid rgba(239, 68, 68, 0.4);
-  border-radius: 12px;
-  padding: 10px 14px;
-  font-size: 15px;
-  font-weight: 600;
-  max-width: 32ch;
-  margin: 0;
-  animation: pop 0.3s ease;
 }
 
 .playing {
@@ -143,4 +164,57 @@
 
 .dot.done {
   background: #22c55e;
+}
+
+/* Meter animation screen */
+.meterScreen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  padding: 24px;
+  animation: pop 0.35s ease;
+}
+
+.meterTitle {
+  font-size: 24px;
+  font-weight: 700;
+  margin: 0;
+  text-align: center;
+}
+
+.meterHint {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0;
+  animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Sticky HUD meter at bottom */
+.stickyMeter {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 8px 12px calc(8px + env(safe-area-inset-bottom));
+  background: rgba(15, 15, 25, 0.95);
+  backdrop-filter: blur(20px);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  z-index: 100;
+  box-sizing: border-box;
+}
+
+.stickyMeter > * {
+  max-width: 500px;
+  margin: 0 auto;
 }

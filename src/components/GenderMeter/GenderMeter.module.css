@@ -1,0 +1,77 @@
+.container {
+  width: 100%;
+  padding: 8px 10px 10px;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-sizing: border-box;
+}
+
+.track {
+  display: flex;
+  align-items: center;
+  height: 36px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 18px;
+  overflow: hidden;
+  position: relative;
+}
+
+.sideGirl {
+  height: 100%;
+  background: linear-gradient(90deg, #ec4899, #f472b6);
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding-left: 8px;
+  min-width: 30px;
+  transition: flex 0.15s ease-out, opacity 0.15s ease-out;
+}
+
+.sideBoy {
+  height: 100%;
+  background: linear-gradient(90deg, #60a5fa, #3b82f6);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 8px;
+  min-width: 30px;
+  transition: flex 0.15s ease-out, opacity 0.15s ease-out;
+}
+
+.sideEmoji {
+  font-size: 18px;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
+}
+
+.divider {
+  width: 32px;
+  height: 32px;
+  background: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  flex-shrink: 0;
+  z-index: 1;
+  margin: 0 -4px;
+}
+
+.dividerIcon {
+  font-size: 16px;
+  font-weight: 800;
+  color: #374151;
+}
+
+.status {
+  margin-top: 6px;
+  text-align: center;
+}
+
+.percent {
+  font-size: 15px;
+  font-weight: 700;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}

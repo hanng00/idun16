@@ -6,6 +6,8 @@ export interface ChallengeProps {
   onComplete: () => void
   /** Optional: call when the player fails in a way that triggers a punishment. */
   onFail?: () => void
+  /** Optional: report live score changes (girlPoints, boyPoints) */
+  onScoreChange?: (girlPoints: number, boyPoints: number) => void
 }
 
 export interface Challenge {

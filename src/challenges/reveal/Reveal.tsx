@@ -1,11 +1,10 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
+import { ACTUAL_GENDER, GENDER_COLORS, GENDER_EMOJI, GENDER_TEXT } from '../../config'
 import styles from './Reveal.module.css'
 
-/** Byt ut mot den riktiga presentkortskoden här. */
-const GIFT_CARD_CODE = 'TVCBTFRO'
-const GIFT_CARD_VALUE = '500,00 kr'
-
-const CONFETTI_COLORS = ['#ff5c8a', '#ffb703', '#8ecae6', '#a3e635', '#c084fc', '#fb7185']
+const CONFETTI_COLORS = ACTUAL_GENDER === 'boy' 
+  ? ['#60a5fa', '#3b82f6', '#2563eb', '#93c5fd', '#bfdbfe']
+  : ['#f472b6', '#ec4899', '#db2777', '#f9a8d4', '#fbcfe8']
 
 interface Piece {
   left: number
@@ -16,7 +15,7 @@ interface Piece {
 }
 
 function makeConfetti(): Piece[] {
-  return Array.from({ length: 80 }, () => ({
+  return Array.from({ length: 100 }, () => ({
     left: Math.random() * 100,
     delay: Math.random() * 2.5,
     duration: 3 + Math.random() * 2.5,
@@ -26,23 +25,11 @@ function makeConfetti(): Piece[] {
 }
 
 export function Reveal() {
-  const [copied, setCopied] = useState(false)
   const [confetti] = useState<Piece[]>(makeConfetti)
 
-  useEffect(() => {
-    if (!copied) return
-    const t = window.setTimeout(() => setCopied(false), 1800)
-    return () => window.clearTimeout(t)
-  }, [copied])
-
-  async function copy() {
-    try {
-      await navigator.clipboard.writeText(GIFT_CARD_CODE)
-      setCopied(true)
-    } catch {
-      setCopied(false)
-    }
-  }
+  const genderColor = GENDER_COLORS[ACTUAL_GENDER]
+  const genderEmoji = GENDER_EMOJI[ACTUAL_GENDER]
+  const genderText = GENDER_TEXT[ACTUAL_GENDER]
 
   return (
     <div className={styles.wrap}>
@@ -65,32 +52,36 @@ export function Reveal() {
       </div>
 
       <div className={styles.card}>
-        <img
-          className={styles.hero}
-          src="lyko-giftcard.png"
-          alt="Lyko presentkort"
-        />
-
-        <div className={styles.value}>
-          <span className={styles.valueLabel}>Värde</span>
-          <span className={styles.valueAmount}>{GIFT_CARD_VALUE}</span>
+        <div className={styles.emojiReveal}>
+          {genderEmoji}
         </div>
 
-        <p className={styles.body}>
-          Grattis! 🎉 Använd koden i kassan online eller i butik.
+        <h1 
+          className={styles.genderText}
+          style={{ color: genderColor }}
+        >
+          DET BLIR EN {genderText}!
+        </h1>
+
+        <p className={styles.congrats}>
+          🎉 Grattis Ida & familjen! 🎉
         </p>
 
-        <div className={styles.codeBlock}>
-          <span className={styles.codeLabel}>Din personliga kod</span>
-          <button type="button" className={styles.code} onClick={copy}>
-            {GIFT_CARD_CODE}
-          </button>
-          <span className={styles.copyHint}>
-            {copied ? 'Kopierad! ✅' : 'Tryck för att kopiera'}
-          </span>
+        <div className={styles.message}>
+          <p>
+            {ACTUAL_GENDER === 'boy' 
+              ? 'En liten kille är på väg! 💙'
+              : 'En liten tjej är på väg! 💗'}
+          </p>
         </div>
 
-        <p className={styles.happy}>Happy shopping! 💅</p>
+        <div className={styles.footer}>
+          <span className={styles.emoji}>👶</span>
+          <span className={styles.emoji}>🍼</span>
+          <span className={styles.emoji}>{genderEmoji}</span>
+          <span className={styles.emoji}>🎀</span>
+          <span className={styles.emoji}>⭐</span>
+        </div>
       </div>
     </div>
   )

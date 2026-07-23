@@ -1,0 +1,167 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  padding: 20px;
+}
+
+.intro {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  text-align: center;
+}
+
+.myth {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0;
+  opacity: 0.8;
+}
+
+.mythDetail {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+  line-height: 1.8;
+}
+
+.instruction {
+  font-size: 15px;
+  margin: 0;
+  opacity: 0.7;
+  max-width: 28ch;
+}
+
+.startBtn {
+  margin-top: 8px;
+  border: none;
+  border-radius: 999px;
+  padding: 16px 36px;
+  font-size: 18px;
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(239, 68, 68, 0.4);
+}
+
+.listening {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
+
+.listenText {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0;
+  animation: pulse 1s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.heart {
+  font-size: 100px;
+  transition: transform 0.1s ease-out;
+  filter: drop-shadow(0 4px 20px rgba(239, 68, 68, 0.5));
+}
+
+.timer {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+  opacity: 0.7;
+}
+
+.tapping {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.tapInstruction {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.tapButton {
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  border: none;
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  font-size: 80px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 32px rgba(239, 68, 68, 0.5);
+  transition: transform 0.1s ease-out;
+}
+
+.tapButton:active {
+  transform: scale(0.95) !important;
+}
+
+.tapCount {
+  font-size: 14px;
+  color: white;
+  font-weight: 700;
+  margin-top: -8px;
+}
+
+.result {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  animation: pop 0.3s ease;
+}
+
+@keyframes pop {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+}
+
+.bpmDisplay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.bpmLabel {
+  font-size: 14px;
+  opacity: 0.7;
+}
+
+.bpmValue {
+  font-size: 32px;
+  font-weight: 800;
+}
+
+.verdict {
+  font-size: 18px;
+  font-weight: 700;
+  margin: 8px 0;
+}
+
+.genderGuess {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0;
+  text-align: center;
+}

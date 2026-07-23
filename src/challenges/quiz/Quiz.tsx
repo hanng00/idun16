@@ -1,12 +1,14 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import type { ChallengeProps } from '../types'
 import { quizQuestions } from './questions'
+import { GENDER_COLORS } from '../../config'
 import styles from './Quiz.module.css'
 
 interface PreparedQuestion {
   question: string
   options: string[]
   correct: number
+  genderVote: 'boy' | 'girl' | 'neutral'
   note?: string
 }
 
@@ -20,31 +22,50 @@ function shuffle<T>(arr: T[]): T[] {
 }
 
 function prepare(): PreparedQuestion[] {
-  return quizQuestions.map((q) => {
+  // Pick 5 random questions
+  const selected = shuffle(quizQuestions).slice(0, 5)
+  return selected.map((q) => {
     const correctValue = q.options[q.correctIndex]
     const options = shuffle(q.options)
     return {
       question: q.question,
       options,
       correct: options.indexOf(correctValue),
+      genderVote: q.genderVote,
       note: q.note,
     }
   })
 }
 
-export function Quiz({ onComplete, onFail }: ChallengeProps) {
+export function Quiz({ onComplete, onScoreChange }: ChallengeProps) {
   const questions = useMemo(prepare, [])
   const [index, setIndex] = useState(0)
   const [picked, setPicked] = useState<number | null>(null)
+  const [boyVotes, setBoyVotes] = useState(0)
+  const [girlVotes, setGirlVotes] = useState(0)
 
   const q = questions[index]
   const isLast = index === questions.length - 1
   const answered = picked !== null
   const isRight = picked === q.correct
 
+  // Report score changes to parent
+  useEffect(() => {
+    onScoreChange?.(girlVotes, boyVotes)
+  }, [girlVotes, boyVotes, onScoreChange])
+
   function choose(i: number) {
     if (answered) return
     setPicked(i)
+    
+    // Count the vote if answered correctly
+    if (i === q.correct) {
+      if (q.genderVote === 'boy') {
+        setBoyVotes((v) => v + 1)
+      } else if (q.genderVote === 'girl') {
+        setGirlVotes((v) => v + 1)
+      }
+    }
   }
 
   function next() {
@@ -56,20 +77,15 @@ export function Quiz({ onComplete, onFail }: ChallengeProps) {
     setPicked(null)
   }
 
-  const failTaunts = [
-    'Fel svar. -5000 aura. 📉 Tillbaka till ballongerna med dig.',
-    'Det där var inte särskilt demure. 🤡 Kör ballongerna igen.',
-    'Crashout detected. 💀 Du får börja om med ballongerna.',
-  ]
-  const failMsg = useMemo(
-    () => failTaunts[Math.floor(Math.random() * failTaunts.length)],
-    [picked],
-  )
-
   return (
     <div className={styles.wrap}>
       <div className={styles.progress}>
-        Fråga {index + 1} / {questions.length} · no crumbs 💅
+        Fråga {index + 1} / {questions.length}
+        <span className={styles.votes}>
+          <span style={{ color: GENDER_COLORS.girl }}>👧 {girlVotes}</span>
+          {' · '}
+          <span style={{ color: GENDER_COLORS.boy }}>{boyVotes} 👦</span>
+        </span>
       </div>
 
       <h3 className={styles.question}>{q.question}</h3>
@@ -78,13 +94,11 @@ export function Quiz({ onComplete, onFail }: ChallengeProps) {
         {q.options.map((opt, i) => {
           const state = !answered
             ? ''
-            : isRight
-              ? i === q.correct
-                ? styles.correct
-                : styles.dim
+            : i === q.correct
+              ? styles.correct
               : i === picked
                 ? styles.wrong
-                : ''
+                : styles.dim
           return (
             <button
               key={opt}
@@ -94,7 +108,7 @@ export function Quiz({ onComplete, onFail }: ChallengeProps) {
               disabled={answered}
             >
               {opt}
-              {answered && isRight && i === q.correct && (
+              {answered && i === q.correct && (
                 <span className={styles.mark}> ✓</span>
               )}
               {answered && !isRight && i === picked && (
@@ -109,24 +123,27 @@ export function Quiz({ onComplete, onFail }: ChallengeProps) {
         <div className={styles.feedback}>
           {isRight ? (
             <>
-              <p className={styles.reaction}>Rätt! 🎉</p>
+              <p className={styles.reaction}>
+                Rätt! 🎉
+                {q.genderVote !== 'neutral' && (
+                  <span 
+                    className={styles.voteInfo}
+                    style={{ color: GENDER_COLORS[q.genderVote] }}
+                  >
+                    +1 {q.genderVote === 'boy' ? '👦' : '👧'}
+                  </span>
+                )}
+              </p>
               {q.note && <p className={styles.note}>{q.note}</p>}
-              <button type="button" className={styles.nextBtn} onClick={next}>
-                {isLast ? 'Klar!' : 'Nästa'}
-              </button>
             </>
           ) : (
-            <>
-              <p className={`${styles.reaction} ${styles.fake}`}>{failMsg}</p>
-              <button
-                type="button"
-                className={styles.nextBtn}
-                onClick={() => (onFail ? onFail() : setPicked(null))}
-              >
-                Tillbaka till ballongerna 🎈
-              </button>
-            </>
+            <p className={`${styles.reaction} ${styles.wrongReaction}`}>
+              Fel! 😅 Rätt svar: {q.options[q.correct]}
+            </p>
           )}
+          <button type="button" className={styles.nextBtn} onClick={next}>
+            {isLast ? 'Klar!' : 'Nästa'}
+          </button>
         </div>
       )}
     </div>

@@ -1,163 +1,154 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useState } from 'react'
 import './App.css'
 import { challenges } from './challenges/registry'
 import { Reveal } from './challenges/reveal/Reveal'
-import { RunawayButton } from './challenges/troll/RunawayButton'
-import { TrollGate } from './challenges/troll/TrollGate'
+import { GenderMeter } from './components/GenderMeter/GenderMeter'
+import { RIGGED_POSITIONS, ACTUAL_GENDER, FINAL_REVEAL_PERCENT } from './config'
 
-type Screen = 'welcome' | 'intro' | 'playing' | 'gate' | 'reveal'
-
-/** She unlocked the gift card once `?done=1` is in the URL. */
-function isUnlocked(): boolean {
-  if (typeof window === 'undefined') return false
-  return new URLSearchParams(window.location.search).get('done') === '1'
-}
+type Screen = 'welcome' | 'intro' | 'playing' | 'result' | 'reveal'
 
 function App() {
-  const [screen, setScreen] = useState<Screen>(() =>
-    isUnlocked() ? 'reveal' : 'welcome',
-  )
+  const [screen, setScreen] = useState<Screen>('welcome')
   const [index, setIndex] = useState(0)
-  const [returnTo, setReturnTo] = useState<number | null>(null)
-  const [runKey, setRunKey] = useState(0)
-  const [punish, setPunish] = useState(false)
-  const [skipTaunt, setSkipTaunt] = useState(0)
+  const [baseMeterPercent, setBaseMeterPercent] = useState(50) // The "rigged" base from previous games
+  const [liveMeterPercent, setLiveMeterPercent] = useState(50) // Real-time during gameplay
+  const [showMeter, setShowMeter] = useState(false)
 
   const current = challenges[index]
   const total = challenges.length
-
-  // Persist the unlocked reveal in the URL so it survives a page refresh.
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search)
-    const has = params.get('done') === '1'
-    if (screen === 'reveal' && !has) {
-      params.set('done', '1')
-      window.history.replaceState(null, '', `?${params.toString()}`)
-    } else if (screen !== 'reveal' && has) {
-      params.delete('done')
-      const q = params.toString()
-      window.history.replaceState(null, '', q ? `?${q}` : window.location.pathname)
-    }
-  }, [screen])
+  const isLastGame = index === total - 1
 
   const startQuest = useCallback(() => {
     setIndex(0)
-    setReturnTo(null)
+    setBaseMeterPercent(50)
+    setLiveMeterPercent(50)
+    setShowMeter(true)
     setScreen('intro')
   }, [])
 
   const beginChallenge = useCallback(() => {
-    setPunish(false)
     setScreen('playing')
   }, [])
 
-  const completeChallenge = useCallback(() => {
-    // If she was punished back to an earlier stage, resume where she failed.
-    if (returnTo !== null && index < returnTo) {
-      const target = returnTo
-      setReturnTo(null)
-      setIndex(target)
-      setScreen('intro')
+  // Called by games to report live score changes
+  const handleScoreChange = useCallback((girlPoints: number, boyPoints: number) => {
+    const total = girlPoints + boyPoints
+    if (total === 0) {
+      setLiveMeterPercent(baseMeterPercent)
       return
     }
-    if (index + 1 >= total) {
-      setScreen('gate')
-    } else {
-      setIndex((i) => i + 1)
-      setScreen('intro')
-    }
-  }, [index, total, returnTo])
+    // Calculate shift from game: positive = more boy, negative = more girl
+    const gameShift = ((boyPoints - girlPoints) / Math.max(total, 1)) * 25 // Max ±25% swing from one game
+    const newPercent = Math.max(5, Math.min(95, baseMeterPercent + gameShift))
+    setLiveMeterPercent(newPercent)
+  }, [baseMeterPercent])
 
-  const failChallenge = useCallback(() => {
-    // Send her all the way back to redo the balloon challenge (index 0).
-    setReturnTo(index)
-    setIndex(0)
-    setRunKey((k) => k + 1)
-    setPunish(true)
-    setScreen('intro')
-  }, [index])
+  const completeChallenge = useCallback(() => {
+    setScreen('result')
+    
+    // After a short delay showing the result, move to next game
+    setTimeout(() => {
+      if (isLastGame) {
+        // Final reveal!
+        const finalPercent = ACTUAL_GENDER === 'boy' ? FINAL_REVEAL_PERCENT : (100 - FINAL_REVEAL_PERCENT)
+        setLiveMeterPercent(finalPercent)
+        setTimeout(() => {
+          setShowMeter(false)
+          setScreen('reveal')
+        }, 2000)
+      } else {
+        // Set the new base to the rigged position for next game
+        const riggedPosition = RIGGED_POSITIONS[index]
+        setBaseMeterPercent(riggedPosition)
+        setLiveMeterPercent(riggedPosition)
+        setIndex((i) => i + 1)
+        setScreen('intro')
+      }
+    }, 1500)
+  }, [index, isLastGame])
 
-  const skipTaunts = [
-    'Haha nej. 💀',
-    'Fint försök, väldigt delulu. 🌌',
-    'Absolut inte.',
-    'Du måste jobba för det. 💅',
-  ]
+  // Display meter: during play show live, otherwise show base
+  const displayMeterPercent = screen === 'playing' ? liveMeterPercent : 
+                              screen === 'result' && isLastGame ? liveMeterPercent :
+                              baseMeterPercent
 
   return (
-    <main className="quest">
-      {screen === 'welcome' && (
-        <section className="welcome">
-          <div className="bigEmoji">🎂</div>
-          <h1>Grattis på 16-årsdagen!</h1>
-          <p className="lead">
-            Innan du får ditt presentkort måste du klara {total} utmaningar.
-            Inga genvägar, no crumbs. Let her cook 👨‍🍳
-          </p>
-          <RunawayButton dodges={2} onClick={startQuest}>
-            Kör igång 🚀
-          </RunawayButton>
-          <button
-            type="button"
-            className="skip"
-            onClick={() => setSkipTaunt((n) => (n + 1) % skipTaunts.length)}
-          >
-            {skipTaunt === 0 ? 'Hoppa över alla utmaningar' : skipTaunts[skipTaunt]}
-          </button>
-        </section>
+    <div className="appContainer">
+      {/* Sticky header breadcrumb */}
+      {showMeter && (
+        <div className="stickyHeader">
+          <div className="breadcrumb">
+            <span className="breadcrumbStep">Spel {index + 1}/{total}</span>
+            <span className="breadcrumbTitle">{current.emoji} {current.title}</span>
+          </div>
+        </div>
       )}
 
-      {screen === 'intro' && (
-        <section className="intro">
-          <StepDots total={total} index={index} />
-          {punish && (
-            <p className="punish">
-              💀 Fel svar i quizet! -5000 aura. Du måste klara ballongerna igen
-              innan du får fortsätta.
+      <main className="quest">
+        {screen === 'welcome' && (
+          <section className="welcome">
+            <div className="bigEmoji">👶</div>
+            <h1>Idas Könsavslöjande!</h1>
+            <p className="lead">
+              Spela {total} minispel för att avslöja om det blir en pojke eller flicka!
+              Varje spel påverkar könsmätaren... 🎲
             </p>
-          )}
-          <div className="bigEmoji">{current.emoji}</div>
-          <p className="stepCount">
-            Utmaning {index + 1} av {total}
-          </p>
-          <h2>{current.title}</h2>
-          <p className="lead">{current.intro}</p>
-          <button type="button" className="cta" onClick={beginChallenge}>
-            Starta utmaningen
-          </button>
-        </section>
-      )}
+            <button type="button" className="cta" onClick={startQuest}>
+              Kör igång! 🚀
+            </button>
+          </section>
+        )}
 
-      {screen === 'playing' && (
-        <section className="playing">
-          <StepDots total={total} index={index} />
-          <h2 className="playHeading">
-            {current.emoji} {current.title}
-          </h2>
-          <current.Component
-            key={`${current.id}-${runKey}`}
-            onComplete={completeChallenge}
-            onFail={failChallenge}
+        {screen === 'intro' && (
+          <section className="intro">
+            <div className="bigEmoji">{current.emoji}</div>
+            <h2>{current.title}</h2>
+            <p className="lead">{current.intro}</p>
+            <button type="button" className="cta" onClick={beginChallenge}>
+              Starta spelet
+            </button>
+          </section>
+        )}
+
+        {screen === 'playing' && (
+          <section className="playing">
+            <current.Component
+              key={current.id}
+              onComplete={completeChallenge}
+              onScoreChange={handleScoreChange}
+            />
+          </section>
+        )}
+
+        {screen === 'result' && (
+          <section className="meterScreen">
+            <h2 className="meterTitle">
+              {isLastGame ? '🥁 Och resultatet är...' : '✅ Spel klart!'}
+            </h2>
+            {!isLastGame && (
+              <p className="meterHint">
+                {liveMeterPercent > 50 
+                  ? `Pojke leder! 👦`
+                  : liveMeterPercent < 50 
+                    ? `Flicka leder! 👧`
+                    : 'Helt jämnt! 🤝'}
+              </p>
+            )}
+          </section>
+        )}
+
+        {screen === 'reveal' && <Reveal />}
+      </main>
+
+      {/* Sticky HUD meter at bottom */}
+      {showMeter && (
+        <div className="stickyMeter">
+          <GenderMeter 
+            targetPercent={displayMeterPercent} 
+            showLabel={true}
           />
-        </section>
+        </div>
       )}
-
-      {screen === 'gate' && <TrollGate onSurvive={() => setScreen('reveal')} />}
-
-      {screen === 'reveal' && <Reveal />}
-    </main>
-  )
-}
-
-function StepDots({ total, index }: { total: number; index: number }) {
-  return (
-    <div className="dots" aria-label={`Steg ${index + 1} av ${total}`}>
-      {Array.from({ length: total }, (_, i) => (
-        <span
-          key={i}
-          className={`dot ${i < index ? 'done' : i === index ? 'active' : ''}`}
-        />
-      ))}
     </div>
   )
 }

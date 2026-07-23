@@ -2,118 +2,133 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
-  text-align: left;
+  padding: 8px 0;
 }
 
 .progress {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   font-size: 14px;
+  font-weight: 600;
   color: var(--text);
-  letter-spacing: 0.3px;
+  opacity: 0.8;
+}
+
+.votes {
+  font-size: 16px;
 }
 
 .question {
-  font-size: 24px;
-  line-height: 1.25;
-  color: var(--text-h);
+  font-size: 20px;
+  font-weight: 700;
   margin: 0;
-  font-weight: 600;
+  line-height: 1.4;
 }
 
 .options {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 
 .option {
-  position: relative;
-  text-align: left;
-  padding: 16px 18px;
-  font-size: 18px;
-  border-radius: 14px;
+  padding: 14px 18px;
   border: 2px solid var(--border);
-  background: var(--bg);
-  color: var(--text-h);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text);
+  font-size: 16px;
+  text-align: left;
   cursor: pointer;
-  transition: transform 0.08s, border-color 0.15s, background 0.15s;
+  transition: all 0.15s ease;
 }
 
-.option:active:not(:disabled) {
-  transform: scale(0.98);
-}
-
-.option:not(:disabled):hover {
-  border-color: var(--accent-border);
+.option:hover:not(:disabled) {
+  border-color: var(--accent);
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .option:disabled {
   cursor: default;
 }
 
-.correct {
+.option.correct {
   border-color: #22c55e;
-  background: rgba(34, 197, 94, 0.12);
+  background: rgba(34, 197, 94, 0.15);
 }
 
-.wrong {
+.option.wrong {
   border-color: #ef4444;
-  background: rgba(239, 68, 68, 0.12);
+  background: rgba(239, 68, 68, 0.15);
 }
 
-.dim {
+.option.dim {
   opacity: 0.5;
 }
 
 .mark {
-  font-weight: 800;
+  font-weight: 700;
 }
 
 .feedback {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  animation: rise 0.25s ease;
+  gap: 12px;
+  animation: slideUp 0.25s ease;
 }
 
-@keyframes rise {
-  from { opacity: 0; transform: translateY(6px); }
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
 }
 
 .reaction {
   font-size: 18px;
-  font-weight: 600;
-  color: var(--text-h);
+  font-weight: 700;
   margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
-.fake {
-  color: #ef4444;
-  animation: buzz 0.3s ease;
+.voteInfo {
+  font-size: 16px;
+  font-weight: 600;
+  padding: 4px 10px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
 }
 
-@keyframes buzz {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-4px); }
-  75% { transform: translateX(4px); }
+.wrongReaction {
+  color: #fca5a5;
 }
 
 .note {
-  font-size: 15px;
+  font-size: 14px;
   color: var(--text);
+  opacity: 0.8;
   margin: 0;
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  line-height: 1.5;
 }
 
 .nextBtn {
-  align-self: flex-end;
-  margin-top: 8px;
+  align-self: flex-start;
   border: none;
   border-radius: 999px;
-  padding: 12px 32px;
-  font-size: 17px;
-  font-weight: 600;
+  padding: 12px 28px;
+  font-size: 16px;
+  font-weight: 700;
   color: #fff;
-  background: linear-gradient(135deg, #ff5c8a, #c084fc);
+  background: linear-gradient(135deg, #f472b6, #60a5fa);
   cursor: pointer;
+  box-shadow: 0 6px 20px rgba(96, 165, 250, 0.35);
+  transition: transform 0.1s;
 }
 
 .nextBtn:active {
